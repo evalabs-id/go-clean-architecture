@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/evalabs-id/go-clean-architecture/pkg/log"
+	"github.com/evalabs-id/go-clean-architecture/pkg/logger"
 	"github.com/rs/zerolog"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
@@ -38,7 +38,7 @@ func (app *App) Run() {
 	opts = append(opts, fx.Invoke(app.Invokers...))
 	opts = append(opts, fx.Invoke(app.Servers...))
 	opts = append(opts, fx.WithLogger(func(l zerolog.Logger) fxevent.Logger {
-		return log.Default(l)
+		return logger.Default(l)
 	}))
 
 	fx.New(opts...).Run()
