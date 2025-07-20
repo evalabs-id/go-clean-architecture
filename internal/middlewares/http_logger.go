@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/evalabs-id/go-clean-architecture/pkg/helper/httphelper"
-	"github.com/evalabs-id/go-clean-architecture/pkg/log"
+	"github.com/evalabs-id/go-clean-architecture/pkg/logger"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/zerolog"
 )
@@ -72,7 +72,7 @@ func (m *HttpMiddleware) Recoverer(next http.Handler) http.Handler {
 
 func (m *HttpMiddleware) LoggerContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := log.InjectLoggerToContext(r.Context(), m.Logger)
+		ctx := logger.InjectLoggerToContext(r.Context(), m.Logger)
 
 		r = r.WithContext(ctx)
 
