@@ -10,6 +10,7 @@ type Config struct {
 	App      App
 	Server   Server
 	Database Database
+	JWT      JWT
 }
 
 type App struct {
@@ -33,6 +34,13 @@ type Database struct {
 	Password string
 	Name     string
 	SSLMode  string
+}
+
+type JWT struct {
+	SecretKey            string
+	AccessTokenDuration  string // in minutes
+	RefreshTokenDuration string // in hours
+	Issuer               string
 }
 
 func ProvideConfig() (*Config, error) {
@@ -113,6 +121,24 @@ func validateConfig(config *Config) error {
 	config.Database.SSLMode = "disable" // default SSL mode
 	if sslMode := os.Getenv("DB_SSLMODE"); sslMode != "" {
 		config.Database.SSLMode = sslMode
+	}
+
+	// JWT configuration
+	config.JWT.SecretKey = os.Getenv("JWT_SECRET_KEY")
+	if config.JWT.SecretKey == "" {
+		return fmt.Errorf("JWT secret key cannot be empty")
+	}
+	config.JWT.AccessTokenDuration = "15m" // default 15 minutes
+	if accessDuration := os.Getenv("JWT_ACCESS_TOKEN_DURATION"); accessDuration != "" {
+		config.JWT.AccessTokenDuration = accessDuration
+	}
+	config.JWT.RefreshTokenDuration = "24h" // default 24 hours
+	if refreshDuration := os.Getenv("JWT_REFRESH_TOKEN_DURATION"); refreshDuration != "" {
+		config.JWT.RefreshTokenDuration = refreshDuration
+	}
+	config.JWT.Issuer = os.Getenv("JWT_ISSUER")
+	if config.JWT.Issuer == "" {
+		config.JWT.Issuer = config.App.Name // default to app name
 	}
 
 	return nil
