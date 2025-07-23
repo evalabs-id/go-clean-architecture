@@ -1,22 +1,24 @@
 -- +goose Up
 -- +goose StatementBegin
-// create simple users table
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
-    username VARCHAR(50) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
+    name VARCHAR(100) NOT NULL,
+    password VARCHAR(255) NOT NULL,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_username ON users(username);
+-- create composite index on email and is_active
+CREATE INDEX idx_user_id ON users (id);
+CREATE UNIQUE INDEX idx_users_email_active ON users (email, is_active);
+CREATE INDEX idx_users_created_at ON users (created_at);
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-DROP INDEX IF EXISTS idx_users_email;
-DROP INDEX IF EXISTS idx_users_username;
+DROP INDEX IF EXISTS idx_users_email_active;
+DROP INDEX IF EXISTS idx_users_created_at;
+DROP INDEX IF EXISTS idx_user_id;
 DROP TABLE IF EXISTS users;
 -- +goose StatementEnd
