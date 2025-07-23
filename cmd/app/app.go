@@ -14,6 +14,15 @@ type App struct {
 	Invokers     []any
 }
 
+func New() *App {
+	return &App{
+		Modules:      []fx.Option{},
+		Servers:      []any{},
+		Dependencies: []any{},
+		Invokers:     []any{},
+	}
+}
+
 func (app *App) AddModules(modules ...fx.Option) {
 	app.Modules = append(app.Modules, modules...)
 }
@@ -35,8 +44,8 @@ func (app *App) Run() {
 
 	opts = append(opts, app.Modules...)
 	opts = append(opts, fx.Provide(app.Dependencies...))
+	opts = append(opts, fx.Provide(app.Servers...))
 	opts = append(opts, fx.Invoke(app.Invokers...))
-	opts = append(opts, fx.Invoke(app.Servers...))
 	opts = append(opts, fx.WithLogger(func(l zerolog.Logger) fxevent.Logger {
 		return logger.Default(l)
 	}))
