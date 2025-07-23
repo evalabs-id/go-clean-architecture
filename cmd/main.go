@@ -8,7 +8,6 @@ import (
 	"github.com/evalabs-id/go-clean-architecture/internal/middlewares"
 	"github.com/evalabs-id/go-clean-architecture/internal/providers"
 	generalv1 "github.com/evalabs-id/go-clean-architecture/modules/general/v1"
-	"github.com/evalabs-id/go-clean-architecture/pkg/logger"
 	_ "github.com/lib/pq"
 )
 
@@ -17,7 +16,7 @@ func main() {
 
 	apps.AddDependencies(
 		configs.ProvideConfig,
-		logger.ProvideZerolog,
+		providers.ProvideZerolog,
 		providers.SqlxDB,
 		middlewares.ProvideHttpMiddleware,
 		middlewares.ProvideAuthenticationMiddleware,
