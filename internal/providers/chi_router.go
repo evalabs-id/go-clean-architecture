@@ -16,7 +16,7 @@ import (
 type Router struct {
 	Public    bool
 	Pattern   string
-	SubRouter chi.Router
+	SubRouter func(chi.Router)
 }
 
 var corsOptions = cors.Options{
@@ -53,7 +53,7 @@ func Routes(params routesParams) *chi.Mux {
 		"message": "I'm alive!",
 	}))
 
-	// Mount routes based on protection level
+	// Register routes based on protection level
 	r.Group(func(r chi.Router) {
 		// Content-Type validation middleware
 		r.Use(middlewares.ContentTypeValidator)
@@ -63,7 +63,7 @@ func Routes(params routesParams) *chi.Mux {
 			// Protected routes
 			for _, router := range params.ModuleRouters {
 				if !router.Public {
-					r.Mount(router.Pattern, router.SubRouter)
+					r.Route(router.Pattern, router.SubRouter)
 				}
 			}
 		})
@@ -71,7 +71,7 @@ func Routes(params routesParams) *chi.Mux {
 		// Public routes
 		for _, router := range params.ModuleRouters {
 			if router.Public {
-				r.Mount(router.Pattern, router.SubRouter)
+				r.Route(router.Pattern, router.SubRouter)
 			}
 		}
 	})
