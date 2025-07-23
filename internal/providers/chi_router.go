@@ -3,9 +3,9 @@ package providers
 import (
 	"net/http"
 
+	"github.com/evalabs-id/go-clean-architecture/internal/configs"
 	"github.com/evalabs-id/go-clean-architecture/internal/middlewares"
 	"github.com/evalabs-id/go-clean-architecture/pkg/helper/httphelper"
-	"github.com/evalabs-id/go-clean-architecture/pkg/helper/jwthelper"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
@@ -30,14 +30,14 @@ var corsOptions = cors.Options{
 type routesParams struct {
 	fx.In
 	ModuleRouters []Router `group:"routers"`
-	JWTHelper     *jwthelper.JWTHelper
+	Config        *configs.Config
 	Logger        zerolog.Logger
 }
 
 func Routes(params routesParams) *chi.Mux {
 	r := chi.NewRouter()
 	httpMiddleware := middlewares.ProvideHttpMiddleware(params.Logger)
-	authMiddleware := middlewares.ProvideAuthenticationMiddleware(params.JWTHelper)
+	authMiddleware := middlewares.ProvideAuthenticationMiddleware(params.Config)
 
 	// default middleware mounted
 	r.Use(cors.Handler(corsOptions))

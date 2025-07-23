@@ -7,7 +7,6 @@ import (
 	"github.com/evalabs-id/go-clean-architecture/internal/configs"
 	"github.com/evalabs-id/go-clean-architecture/internal/middlewares"
 	"github.com/evalabs-id/go-clean-architecture/internal/providers"
-	"github.com/evalabs-id/go-clean-architecture/pkg/helper/jwthelper"
 	"github.com/evalabs-id/go-clean-architecture/pkg/logger"
 	_ "github.com/lib/pq"
 )
@@ -19,7 +18,6 @@ func main() {
 		configs.ProvideConfig,
 		logger.ProvideZerolog,
 		providers.SqlxDB,
-		jwthelper.ProvideJWTHelper,
 		middlewares.ProvideHttpMiddleware,
 		middlewares.ProvideAuthenticationMiddleware,
 		providers.Routes,

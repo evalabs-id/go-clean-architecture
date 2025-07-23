@@ -10,10 +10,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type JWTHelper struct {
-	Config *configs.Config
-}
-
 type TokenClaims struct {
 	UserID    string `json:"user_id"`
 	Email     string `json:"email,omitempty"`
@@ -34,20 +30,14 @@ var (
 	ErrInvalidClaims    = errors.New("invalid token claims")
 )
 
-func ProvideJWTHelper(config *configs.Config) *JWTHelper {
-	return &JWTHelper{
-		Config: config,
-	}
-}
-
 // GenerateTokenPair creates both access and refresh tokens
-func (j *JWTHelper) GenerateTokenPair(userID, email string) (*TokenPair, error) {
-	accessToken, accessExp, err := j.GenerateAccessToken(userID, email)
+func GenerateTokenPair(config *configs.Config, userID, email string) (*TokenPair, error) {
+	accessToken, accessExp, err := GenerateAccessToken(config, userID, email)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate access token: %w", err)
 	}
 
-	refreshToken, _, err := j.GenerateRefreshToken(userID)
+	refreshToken, _, err := GenerateRefreshToken(config, userID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate refresh token: %w", err)
 	}
@@ -60,8 +50,8 @@ func (j *JWTHelper) GenerateTokenPair(userID, email string) (*TokenPair, error) 
 }
 
 // GenerateAccessToken creates a new access token
-func (j *JWTHelper) GenerateAccessToken(userID, email string) (string, time.Time, error) {
-	duration, err := j.getAccessTokenDuration()
+func GenerateAccessToken(config *configs.Config, userID, email string) (string, time.Time, error) {
+	duration, err := getAccessTokenDuration(config)
 	if err != nil {
 		return "", time.Time{}, err
 	}
@@ -76,13 +66,13 @@ func (j *JWTHelper) GenerateAccessToken(userID, email string) (string, time.Time
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
-			Issuer:    j.Config.JWT.Issuer,
+			Issuer:    config.JWT.Issuer,
 			Subject:   userID,
 		},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte(j.Config.JWT.SecretKey))
+	tokenString, err := token.SignedString([]byte(config.JWT.SecretKey))
 	if err != nil {
 		return "", time.Time{}, fmt.Errorf("failed to sign token: %w", err)
 	}
@@ -91,8 +81,8 @@ func (j *JWTHelper) GenerateAccessToken(userID, email string) (string, time.Time
 }
 
 // GenerateRefreshToken creates a new refresh token
-func (j *JWTHelper) GenerateRefreshToken(userID string) (string, time.Time, error) {
-	duration, err := j.getRefreshTokenDuration()
+func GenerateRefreshToken(config *configs.Config, userID string) (string, time.Time, error) {
+	duration, err := getRefreshTokenDuration(config)
 	if err != nil {
 		return "", time.Time{}, err
 	}
@@ -106,13 +96,13 @@ func (j *JWTHelper) GenerateRefreshToken(userID string) (string, time.Time, erro
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
-			Issuer:    j.Config.JWT.Issuer,
+			Issuer:    config.JWT.Issuer,
 			Subject:   userID,
 		},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte(j.Config.JWT.SecretKey))
+	tokenString, err := token.SignedString([]byte(config.JWT.SecretKey))
 	if err != nil {
 		return "", time.Time{}, fmt.Errorf("failed to sign token: %w", err)
 	}
@@ -121,12 +111,12 @@ func (j *JWTHelper) GenerateRefreshToken(userID string) (string, time.Time, erro
 }
 
 // ValidateToken validates and parses a JWT token
-func (j *JWTHelper) ValidateToken(tokenString string) (*TokenClaims, error) {
+func ValidateToken(config *configs.Config, tokenString string) (*TokenClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(j.Config.JWT.SecretKey), nil
+		return []byte(config.JWT.SecretKey), nil
 	})
 
 	if err != nil {
@@ -145,8 +135,8 @@ func (j *JWTHelper) ValidateToken(tokenString string) (*TokenClaims, error) {
 }
 
 // ValidateAccessToken validates specifically access tokens
-func (j *JWTHelper) ValidateAccessToken(tokenString string) (*TokenClaims, error) {
-	claims, err := j.ValidateToken(tokenString)
+func ValidateAccessToken(config *configs.Config, tokenString string) (*TokenClaims, error) {
+	claims, err := ValidateToken(config, tokenString)
 	if err != nil {
 		return nil, err
 	}
@@ -159,8 +149,8 @@ func (j *JWTHelper) ValidateAccessToken(tokenString string) (*TokenClaims, error
 }
 
 // ValidateRefreshToken validates specifically refresh tokens
-func (j *JWTHelper) ValidateRefreshToken(tokenString string) (*TokenClaims, error) {
-	claims, err := j.ValidateToken(tokenString)
+func ValidateRefreshToken(config *configs.Config, tokenString string) (*TokenClaims, error) {
+	claims, err := ValidateToken(config, tokenString)
 	if err != nil {
 		return nil, err
 	}
@@ -173,20 +163,20 @@ func (j *JWTHelper) ValidateRefreshToken(tokenString string) (*TokenClaims, erro
 }
 
 // RefreshAccessToken creates a new access token using a valid refresh token
-func (j *JWTHelper) RefreshAccessToken(refreshTokenString string) (*TokenPair, error) {
-	refreshClaims, err := j.ValidateRefreshToken(refreshTokenString)
+func RefreshAccessToken(config *configs.Config, refreshTokenString string) (*TokenPair, error) {
+	refreshClaims, err := ValidateRefreshToken(config, refreshTokenString)
 	if err != nil {
 		return nil, fmt.Errorf("invalid refresh token: %w", err)
 	}
 
 	// Generate new token pair
-	return j.GenerateTokenPair(refreshClaims.UserID, refreshClaims.Email)
+	return GenerateTokenPair(config, refreshClaims.UserID, refreshClaims.Email)
 }
 
 // ExtractUserID extracts user ID from token without full validation (for logging purposes)
-func (j *JWTHelper) ExtractUserID(tokenString string) string {
+func ExtractUserID(config *configs.Config, tokenString string) string {
 	token, err := jwt.ParseWithClaims(tokenString, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(j.Config.JWT.SecretKey), nil
+		return []byte(config.JWT.SecretKey), nil
 	})
 
 	if err != nil {
@@ -201,9 +191,9 @@ func (j *JWTHelper) ExtractUserID(tokenString string) string {
 }
 
 // IsTokenExpired checks if token is expired without validating signature
-func (j *JWTHelper) IsTokenExpired(tokenString string) bool {
+func IsTokenExpired(config *configs.Config, tokenString string) bool {
 	token, err := jwt.ParseWithClaims(tokenString, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(j.Config.JWT.SecretKey), nil
+		return []byte(config.JWT.SecretKey), nil
 	})
 
 	if err != nil {
@@ -218,8 +208,8 @@ func (j *JWTHelper) IsTokenExpired(tokenString string) bool {
 }
 
 // GetTokenRemainingTime returns how much time is left before token expires
-func (j *JWTHelper) GetTokenRemainingTime(tokenString string) time.Duration {
-	claims, err := j.ValidateToken(tokenString)
+func GetTokenRemainingTime(config *configs.Config, tokenString string) time.Duration {
+	claims, err := ValidateToken(config, tokenString)
 	if err != nil {
 		return 0
 	}
@@ -233,16 +223,16 @@ func (j *JWTHelper) GetTokenRemainingTime(tokenString string) time.Duration {
 }
 
 // Helper functions for duration parsing
-func (j *JWTHelper) getAccessTokenDuration() (time.Duration, error) {
-	minutes, err := strconv.Atoi(j.Config.JWT.AccessTokenDuration)
+func getAccessTokenDuration(config *configs.Config) (time.Duration, error) {
+	minutes, err := strconv.Atoi(config.JWT.AccessTokenDuration)
 	if err != nil {
 		return 0, fmt.Errorf("invalid access token duration: %w", err)
 	}
 	return time.Duration(minutes) * time.Minute, nil
 }
 
-func (j *JWTHelper) getRefreshTokenDuration() (time.Duration, error) {
-	hours, err := strconv.Atoi(j.Config.JWT.RefreshTokenDuration)
+func getRefreshTokenDuration(config *configs.Config) (time.Duration, error) {
+	hours, err := strconv.Atoi(config.JWT.RefreshTokenDuration)
 	if err != nil {
 		return 0, fmt.Errorf("invalid refresh token duration: %w", err)
 	}

@@ -4,18 +4,19 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/evalabs-id/go-clean-architecture/internal/configs"
 	"github.com/evalabs-id/go-clean-architecture/pkg/constant"
 	"github.com/evalabs-id/go-clean-architecture/pkg/helper/httphelper"
 	"github.com/evalabs-id/go-clean-architecture/pkg/helper/jwthelper"
 )
 
 type AuthenticationMiddleware struct {
-	JWTHelper *jwthelper.JWTHelper
+	Config *configs.Config
 }
 
-func ProvideAuthenticationMiddleware(j *jwthelper.JWTHelper) *AuthenticationMiddleware {
+func ProvideAuthenticationMiddleware(config *configs.Config) *AuthenticationMiddleware {
 	return &AuthenticationMiddleware{
-		JWTHelper: j,
+		Config: config,
 	}
 }
 
@@ -42,7 +43,7 @@ func (a *AuthenticationMiddleware) Authenticate(next http.Handler) http.Handler 
 
 		tokenString = tokenString[7:]
 
-		claims, err := a.JWTHelper.ValidateAccessToken(tokenString)
+		claims, err := jwthelper.ValidateAccessToken(a.Config, tokenString)
 		if err != nil {
 			httphelper.SimpleError(
 				"Invalid or expired token",
