@@ -11,7 +11,7 @@ const (
 	UserCacheDuration = time.Hour * 2
 
 	// Context keys for middleware
-	UserEmailContextKey    ContextKey = "user.email"
-	UserFullnameContextKey ContextKey = "user.fullname"
-	UserClaimsContextKey   ContextKey = "user.claims"
+	UserIDContextKey     ContextKey = "user.id"
+	UserEmailContextKey  ContextKey = "user.email"
+	UserClaimsContextKey ContextKey = "user.claims"
 )

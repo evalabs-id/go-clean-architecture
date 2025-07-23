@@ -5,6 +5,7 @@ import (
 
 	"github.com/evalabs-id/go-clean-architecture/internal/middlewares"
 	"github.com/evalabs-id/go-clean-architecture/pkg/helper/httphelper"
+	"github.com/evalabs-id/go-clean-architecture/pkg/helper/jwthelper"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
@@ -29,12 +30,14 @@ var corsOptions = cors.Options{
 type routesParams struct {
 	fx.In
 	ModuleRouters []Router `group:"routers"`
+	JWTHelper     *jwthelper.JWTHelper
 	Logger        zerolog.Logger
 }
 
 func Routes(params routesParams) *chi.Mux {
 	r := chi.NewRouter()
 	httpMiddleware := middlewares.ProvideHttpMiddleware(params.Logger)
+	authMiddleware := middlewares.ProvideAuthenticationMiddleware(params.JWTHelper)
 
 	// default middleware mounted
 	r.Use(cors.Handler(corsOptions))
@@ -51,27 +54,27 @@ func Routes(params routesParams) *chi.Mux {
 	}))
 
 	// Mount routes based on protection level
-	// r.Group(func(r chi.Router) {
-	// Content-Type validation middleware
-	// 	r.Use(middleware.ContentTypeValidator)
+	r.Group(func(r chi.Router) {
+		// Content-Type validation middleware
+		r.Use(middlewares.ContentTypeValidator)
 
-	// 	r.Group(func(r chi.Router) {
-	// 		r.Use(authMiddleware.ValidateToken)
-	// Protected routes
-	// 		for _, router := range params.ModuleRouters {
-	// 			if !router.Public {
-	// 				r.Mount(router.Pattern, router.SubRouter)
-	// 			}
-	// 		}
-	// 	})
+		r.Group(func(r chi.Router) {
+			r.Use(authMiddleware.Authenticate)
+			// Protected routes
+			for _, router := range params.ModuleRouters {
+				if !router.Public {
+					r.Mount(router.Pattern, router.SubRouter)
+				}
+			}
+		})
 
-	// Public routes
-	// 	for _, router := range params.ModuleRouters {
-	// 		if router.Public {
-	// 			r.Mount(router.Pattern, router.SubRouter)
-	// 		}
-	// 	}
-	// })
+		// Public routes
+		for _, router := range params.ModuleRouters {
+			if router.Public {
+				r.Mount(router.Pattern, router.SubRouter)
+			}
+		}
+	})
 
 	// TODO: add fallbacks
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
