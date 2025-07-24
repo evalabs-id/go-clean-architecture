@@ -6,8 +6,8 @@ import (
 
 	"github.com/evalabs-id/go-clean-architecture/internal/configs"
 	"github.com/evalabs-id/go-clean-architecture/pkg/constant"
-	"github.com/evalabs-id/go-clean-architecture/pkg/helper/httphelper"
-	"github.com/evalabs-id/go-clean-architecture/pkg/helper/jwthelper"
+	"github.com/evalabs-id/go-clean-architecture/pkg/httphelper"
+	"github.com/evalabs-id/go-clean-architecture/pkg/jwthelper"
 )
 
 type AuthenticationMiddleware struct {

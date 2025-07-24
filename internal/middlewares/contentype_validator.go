@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/evalabs-id/go-clean-architecture/pkg/helper/httphelper"
+	"github.com/evalabs-id/go-clean-architecture/pkg/httphelper"
 )
 
 // ContentTypeValidator validates the Content-Type header for requests with body

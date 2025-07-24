@@ -3,7 +3,7 @@ package generalv1
 import (
 	"net/http"
 
-	"github.com/evalabs-id/go-clean-architecture/pkg/helper/httphelper"
+	"github.com/evalabs-id/go-clean-architecture/pkg/httphelper"
 	"github.com/evalabs-id/go-clean-architecture/pkg/logger"
 )
 

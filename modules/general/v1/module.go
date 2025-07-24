@@ -3,7 +3,7 @@ package generalv1
 import (
 	"github.com/evalabs-id/go-clean-architecture/internal/providers"
 	"github.com/evalabs-id/go-clean-architecture/pkg/constant"
-	"github.com/evalabs-id/go-clean-architecture/pkg/helper/httphelper"
+	"github.com/evalabs-id/go-clean-architecture/pkg/httphelper"
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/fx"
 )

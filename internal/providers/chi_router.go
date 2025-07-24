@@ -5,7 +5,7 @@ import (
 
 	"github.com/evalabs-id/go-clean-architecture/internal/configs"
 	"github.com/evalabs-id/go-clean-architecture/internal/middlewares"
-	"github.com/evalabs-id/go-clean-architecture/pkg/helper/httphelper"
+	"github.com/evalabs-id/go-clean-architecture/pkg/httphelper"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
