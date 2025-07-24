@@ -7,6 +7,7 @@ import (
 	"github.com/evalabs-id/go-clean-architecture/internal/configs"
 	"github.com/evalabs-id/go-clean-architecture/internal/middlewares"
 	"github.com/evalabs-id/go-clean-architecture/internal/providers"
+	authv1 "github.com/evalabs-id/go-clean-architecture/modules/auth/v1"
 	generalv1 "github.com/evalabs-id/go-clean-architecture/modules/general/v1"
 	_ "github.com/lib/pq"
 )
@@ -24,6 +25,7 @@ func main() {
 	)
 
 	apps.AddModules(
+		authv1.Module,
 		generalv1.Module,
 	)
 

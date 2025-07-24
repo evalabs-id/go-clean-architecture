@@ -3,7 +3,6 @@ package jwthelper
 import (
 	"errors"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/evalabs-id/go-clean-architecture/internal/configs"
@@ -224,17 +223,17 @@ func GetTokenRemainingTime(config *configs.Config, tokenString string) time.Dura
 
 // Helper functions for duration parsing
 func getAccessTokenDuration(config *configs.Config) (time.Duration, error) {
-	minutes, err := strconv.Atoi(config.JWT.AccessTokenDuration)
+	duration, err := time.ParseDuration(config.JWT.AccessTokenDuration)
 	if err != nil {
 		return 0, fmt.Errorf("invalid access token duration: %w", err)
 	}
-	return time.Duration(minutes) * time.Minute, nil
+	return duration, nil
 }
 
 func getRefreshTokenDuration(config *configs.Config) (time.Duration, error) {
-	hours, err := strconv.Atoi(config.JWT.RefreshTokenDuration)
+	duration, err := time.ParseDuration(config.JWT.RefreshTokenDuration)
 	if err != nil {
 		return 0, fmt.Errorf("invalid refresh token duration: %w", err)
 	}
-	return time.Duration(hours) * time.Hour, nil
+	return duration, nil
 }

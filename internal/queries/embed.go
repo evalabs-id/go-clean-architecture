@@ -4,11 +4,15 @@ import _ "embed"
 
 var (
 	//go:embed users/select.sql
-	selectUsers string
+	SelectUsers string
 	//go:embed users/get_by_id.sql
-	getUserByID string
+	GetUserByID string
+	//go:embed users/get_by_email.sql
+	GetUserByEmail string
 	//go:embed users/insert.sql
-	insertUser string
+	InsertUser string
 	//go:embed users/update.sql
-	updateUser string
+	UpdateUser string
+	//go:embed users/check_email.sql
+	CountCheckEmail string
 )
