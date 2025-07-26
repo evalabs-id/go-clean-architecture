@@ -25,7 +25,14 @@ go.work
 go.work.sum
 
 # env file
-.env
+.env*
+
+# Build output
+build/
+
+# temporary files
+tmp/
+*.tmp
 
 # Editor/IDE
 # .idea/
