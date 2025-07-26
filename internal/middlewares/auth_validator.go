@@ -10,17 +10,17 @@ import (
 	"github.com/evalabs-id/go-clean-architecture/pkg/jwthelper"
 )
 
-type AuthenticationMiddleware struct {
+type AuthMiddleware struct {
 	Config *configs.Config
 }
 
-func ProvideAuthenticationMiddleware(config *configs.Config) *AuthenticationMiddleware {
-	return &AuthenticationMiddleware{
+func ProvideAuthMiddleware(config *configs.Config) *AuthMiddleware {
+	return &AuthMiddleware{
 		Config: config,
 	}
 }
 
-func (a *AuthenticationMiddleware) Authenticate(next http.Handler) http.Handler {
+func (a *AuthMiddleware) Authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokenString := r.Header.Get("Authorization")
 		if tokenString == "" {

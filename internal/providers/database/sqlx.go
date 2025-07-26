@@ -1,4 +1,4 @@
-package providers
+package database
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	"go.uber.org/fx"
 )
 
-func SqlxDB(lc fx.Lifecycle, cfg *configs.Config) (*sqlx.DB, error) {
+func ProvideDB(lc fx.Lifecycle, cfg *configs.Config) (*sqlx.DB, error) {
 	dsn := fmt.Sprintf("%s://%s:%s@%s:%d/%s?sslmode=%s",
 		cfg.Database.Driver, cfg.Database.Username, cfg.Database.Password, cfg.Database.Host, cfg.Database.Port, cfg.Database.Name, cfg.Database.SSLMode)
 

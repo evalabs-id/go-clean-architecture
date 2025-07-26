@@ -3,8 +3,8 @@ package generalv1
 import (
 	"net/http"
 
+	"github.com/evalabs-id/go-clean-architecture/internal/providers/logger"
 	"github.com/evalabs-id/go-clean-architecture/pkg/httphelper"
-	"github.com/evalabs-id/go-clean-architecture/pkg/logger"
 )
 
 type GeneralHttp struct{}

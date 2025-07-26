@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/bytedance/sonic"
+	"github.com/evalabs-id/go-clean-architecture/internal/providers/logger"
 	"github.com/evalabs-id/go-clean-architecture/pkg/httphelper"
-	"github.com/evalabs-id/go-clean-architecture/pkg/logger"
 )
 
 var (

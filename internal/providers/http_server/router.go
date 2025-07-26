@@ -1,4 +1,4 @@
-package providers
+package httpserver
 
 import (
 	"net/http"
@@ -34,10 +34,10 @@ type routesParams struct {
 	Logger        zerolog.Logger
 }
 
-func Routes(params routesParams) *chi.Mux {
+func ProvideRoutes(params routesParams) *chi.Mux {
 	r := chi.NewRouter()
 	httpMiddleware := middlewares.ProvideHttpMiddleware(params.Logger)
-	authMiddleware := middlewares.ProvideAuthenticationMiddleware(params.Config)
+	authMiddleware := middlewares.ProvideAuthMiddleware(params.Config)
 
 	// default middleware mounted
 	r.Use(cors.Handler(corsOptions))

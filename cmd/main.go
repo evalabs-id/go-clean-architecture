@@ -6,9 +6,12 @@ import (
 	"github.com/evalabs-id/go-clean-architecture/cmd/app"
 	"github.com/evalabs-id/go-clean-architecture/internal/configs"
 	"github.com/evalabs-id/go-clean-architecture/internal/middlewares"
-	"github.com/evalabs-id/go-clean-architecture/internal/providers"
+	"github.com/evalabs-id/go-clean-architecture/internal/providers/database"
+	httpserver "github.com/evalabs-id/go-clean-architecture/internal/providers/http_server"
+	"github.com/evalabs-id/go-clean-architecture/internal/providers/logger"
 	authv1 "github.com/evalabs-id/go-clean-architecture/modules/auth/v1"
 	generalv1 "github.com/evalabs-id/go-clean-architecture/modules/general/v1"
+
 	_ "github.com/lib/pq"
 )
 
@@ -17,11 +20,11 @@ func main() {
 
 	apps.AddDependencies(
 		configs.ProvideConfig,
-		providers.ProvideZerolog,
-		providers.SqlxDB,
+		logger.ProvideZerolog,
+		database.ProvideDB,
 		middlewares.ProvideHttpMiddleware,
-		middlewares.ProvideAuthenticationMiddleware,
-		providers.Routes,
+		middlewares.ProvideAuthMiddleware,
+		httpserver.ProvideRoutes,
 	)
 
 	apps.AddModules(
@@ -29,7 +32,7 @@ func main() {
 		generalv1.Module,
 	)
 
-	apps.AddServers(providers.HttpServer)
+	apps.AddServers(httpserver.HttpServer)
 
 	apps.AddInvokers(func(*http.Server) {})
 

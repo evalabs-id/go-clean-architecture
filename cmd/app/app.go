@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/evalabs-id/go-clean-architecture/pkg/logger"
+	"github.com/evalabs-id/go-clean-architecture/internal/providers/logger"
 	"github.com/rs/zerolog"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
